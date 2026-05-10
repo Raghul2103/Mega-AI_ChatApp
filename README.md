@@ -1,6 +1,6 @@
-# 🚀 Antigravity Multi-Agent AI Orchestration, Observability & Evaluation Engine
+# 🚀  Multi-Agent AI Orchestration, Observability & Evaluation Engine
 
-Antigravity is a state-of-the-art, production-ready multi-agent AI orchestration, observability, and evaluation system built using the **MERN** stack (MongoDB, Express.js, React, Node.js) and powered by the lightning-fast **Groq API**. 
+Mega-AI is a state-of-the-art, production-ready multi-agent AI orchestration, observability, and evaluation system built using the **MERN** stack (MongoDB, Express.js, React, Node.js) and powered by the lightning-fast **Groq API**. 
 
 The platform implements a dynamic routing orchestrator, a rigorous evaluation pipeline, visual real-time telemetry streaming, a separate asynchronous background worker queue, and a self-improving prompt loop.
 
@@ -56,7 +56,7 @@ The system relies on a single root-level `.env` file for core parameters. Create
 ```env
 GROQ_API_KEY=gsk_your_actual_api_key_here
 PORT=5000
-MONGO_URI=mongodb://mongo:27017/antigravity
+MONGO_URI=mongodb://mongo:27017/megaai
 ```
 
 ---
@@ -71,7 +71,7 @@ This approach launches all 5 isolated microservices on **conflict-free host port
    ```
    *If you get an orphan naming conflict error from previous runs, simply run:*
    ```bash
-   docker rm -f antigravity_db
+   docker rm -f megaai_db
    docker compose up --build
    ```
 3. **Access Services**:
