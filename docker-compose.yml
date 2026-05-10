@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  mongo: # Renamed service to 'mongo' to perfectly align with default log-query DNS expectations
+    image: mongo:latest
+    container_name: antigravity_db
+    ports:
+      - "27019:27017" # Mapped to 27019 on host to avoid port 27017 local conflicts
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - antigravity_net
+
+  backend:
+    build: ./backend
+    container_name: antigravity_api
+    ports:
+      - "5050:5000" # Mapped to 5050 on host to avoid port 5000 local conflicts
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/antigravity # Updated to point to 'mongo' service DNS name
+      - PORT=5000
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    depends_on:
+      - mongo
+    networks:
+      - antigravity_net
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  worker:
+    build: ./backend
+    container_name: antigravity_worker
+    command: npm run worker
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/antigravity # Updated to point to 'mongo' service DNS name
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    depends_on:
+      - mongo
+    networks:
+      - antigravity_net
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  log-query-interface:
+    image: mongo-express:latest
+    container_name: antigravity_log_query
+    ports:
+      - "8085:8081" # Mapped to 8085 on host to avoid local port conflicts
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo # Set to 'mongo' service name
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    depends_on:
+      - mongo
+    networks:
+      - antigravity_net
+
+  frontend:
+    build: ./frontend
+    container_name: antigravity_client
+    ports:
+      - "5180:5173" # Mapped to 5180 on host to avoid port 5173 local conflicts
+    environment:
+      - VITE_API_URL=http://localhost:5050/api # Point client to the new backend host port
+    depends_on:
+      - backend
+    networks:
+      - antigravity_net
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+networks:
+  antigravity_net:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
